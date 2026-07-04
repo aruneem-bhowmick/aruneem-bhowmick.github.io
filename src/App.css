@@ -813,6 +813,10 @@
     margin: 0 auto;
   }
 
+  .misc-links {
+    text-align: center;
+  }
+
   .writing-tags {
     gap: 1rem;
   }
