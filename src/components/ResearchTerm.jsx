@@ -1,4 +1,10 @@
-import { useId, useLayoutEffect, useRef, useState } from 'react'
+import { useEffect, useId, useLayoutEffect, useRef, useState } from 'react'
+
+// How long the cursor must rest on a term before it activates. Without this,
+// a cursor merely passing through one term en route to another (they sit a
+// few characters apart in the same sentence) instantly flips its underline
+// blue via plain CSS :hover, even though the pointer never really stops there.
+const HOVER_INTENT_DELAY = 120
 
 // Dotted-underline term with a hover/focus popup: a plain definition plus the
 // moral case for working in that field. Position is clamped in JS (not pure
@@ -9,6 +15,7 @@ export default function ResearchTerm({ definition, moral, children }) {
   const [offset, setOffset] = useState(0)
   const wrapRef = useRef(null)
   const popupRef = useRef(null)
+  const openTimerRef = useRef(null)
   const tooltipId = useId()
 
   useLayoutEffect(() => {
@@ -34,18 +41,41 @@ export default function ResearchTerm({ definition, moral, children }) {
     return () => window.removeEventListener('resize', reposition)
   }, [open])
 
+  useEffect(() => {
+    return () => {
+      if (openTimerRef.current) clearTimeout(openTimerRef.current)
+    }
+  }, [])
+
+  const clearOpenTimer = () => {
+    if (openTimerRef.current) {
+      clearTimeout(openTimerRef.current)
+      openTimerRef.current = null
+    }
+  }
+
+  const scheduleOpen = () => {
+    clearOpenTimer()
+    openTimerRef.current = setTimeout(() => setOpen(true), HOVER_INTENT_DELAY)
+  }
+
+  const closeNow = () => {
+    clearOpenTimer()
+    setOpen(false)
+  }
+
   return (
     <span
       ref={wrapRef}
-      className="research-term"
+      className={`research-term${open ? ' is-active' : ''}`}
       tabIndex={0}
       aria-describedby={tooltipId}
-      onMouseEnter={() => setOpen(true)}
-      onMouseLeave={() => setOpen(false)}
+      onMouseEnter={scheduleOpen}
+      onMouseLeave={closeNow}
       onFocus={() => setOpen(true)}
-      onBlur={() => setOpen(false)}
+      onBlur={closeNow}
       onKeyDown={(e) => {
-        if (e.key === 'Escape') setOpen(false)
+        if (e.key === 'Escape') closeNow()
       }}
     >
       {children}

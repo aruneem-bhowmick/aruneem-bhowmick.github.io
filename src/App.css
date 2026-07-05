@@ -214,7 +214,7 @@
   text-underline-offset: 3px;
 }
 
-.research-term:hover,
+.research-term.is-active,
 .research-term:focus-visible {
   text-decoration-color: var(--link);
 }
