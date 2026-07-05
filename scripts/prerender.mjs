@@ -40,7 +40,7 @@ const escapeJsonLd = (obj) => JSON.stringify(obj).replace(/</g, '\\u003c')
 // Routes to pre-render. Descriptions/images mirror what each page passes to the
 // <SEO> component so the pre-rendered HTML and the hydrated DOM agree.
 const routes = [
-  { path: '/', title: 'Jayden Teoh', description: siteDescription, image: defaultOgImage },
+  { path: '/', title: siteName, description: siteDescription, image: defaultOgImage },
 ]
 
 function metaTags(route) {
