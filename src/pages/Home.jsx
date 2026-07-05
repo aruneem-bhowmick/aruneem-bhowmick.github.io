@@ -2,10 +2,12 @@ import { Brain, Compass, Zap } from 'lucide-react'
 import Header from '../components/Header.jsx'
 import SEO from '../components/SEO.jsx'
 import PaperCard from '../components/PaperCard.jsx'
+import ResearchTerm from '../components/ResearchTerm.jsx'
 import { EncryptedText } from '../components/ui/encrypted-text.jsx'
 import KaggleIcon from '../components/icons/KaggleIcon.jsx'
 import { papers } from '../data/papers.js'
 import { siteDescription } from '../data/site.js'
+import { researchTerms } from '../data/researchTerms.js'
 import { problemSolvingLinks, sweLinks } from '../data/misc.js'
 
 const dockLinks = [
@@ -108,8 +110,19 @@ export default function Home() {
             </span>
           </h2>
           <p className="section-blurb">
-            My interests include reasoning architectures, representation learning, and
-            mechanistic interpretability.
+            My interests include{' '}
+            <ResearchTerm {...researchTerms['reasoning architectures']}>
+              reasoning architectures
+            </ResearchTerm>
+            ,{' '}
+            <ResearchTerm {...researchTerms['representation learning']}>
+              representation learning
+            </ResearchTerm>
+            , and{' '}
+            <ResearchTerm {...researchTerms['mechanistic interpretability']}>
+              mechanistic interpretability
+            </ResearchTerm>
+            .
           </p>
 
           <div className="paper-list">

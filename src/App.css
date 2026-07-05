@@ -202,6 +202,66 @@
   line-height: 1.65;
 }
 
+/* ---------- Research term tooltips ---------- */
+.research-term {
+  position: relative;
+  display: inline;
+  white-space: nowrap;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  text-decoration: underline dotted;
+  text-decoration-color: var(--text-muted);
+  text-underline-offset: 3px;
+}
+
+.research-term:hover,
+.research-term:focus-visible {
+  text-decoration-color: var(--link);
+}
+
+.research-term:focus {
+  outline: none;
+}
+
+.research-term-popup {
+  position: absolute;
+  left: 50%;
+  bottom: calc(100% + 0.65rem);
+  width: min(300px, 80vw);
+  padding: 0.8rem 1rem;
+  background: var(--card-bg);
+  border: 1px solid var(--card-border);
+  border-radius: 8px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.35);
+  font-size: 0.8rem;
+  line-height: 1.55;
+  color: var(--text-secondary);
+  text-align: left;
+  white-space: normal;
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  transition: opacity 0.15s ease, visibility 0.15s ease;
+  z-index: 30;
+}
+
+.research-term-popup.is-open {
+  opacity: 1;
+  visibility: visible;
+  pointer-events: auto;
+}
+
+.research-term-def {
+  display: block;
+  color: var(--text);
+  margin-bottom: 0.55rem;
+}
+
+.research-term-moral {
+  display: block;
+  font-style: italic;
+}
+
 .section-fineprint {
   font-size: 0.75rem;
   color: var(--text-muted);
