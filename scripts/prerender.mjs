@@ -20,14 +20,14 @@ import {
   buildTitle,
   canonicalPath,
   defaultOgImage,
+  personJsonLd,
   siteDescription,
   siteName,
-  siteUrl,
+  toAbsoluteUrl as toAbsolute,
 } from '../src/data/site.js'
 
 const distDir = join(dirname(fileURLToPath(import.meta.url)), '..', 'dist')
 
-const toAbsolute = (path) => new URL(path, siteUrl).toString()
 const escapeAttr = (value) =>
   String(value ?? '')
     .replace(/&/g, '&amp;')
@@ -40,7 +40,13 @@ const escapeJsonLd = (obj) => JSON.stringify(obj).replace(/</g, '\\u003c')
 // Routes to pre-render. Descriptions/images mirror what each page passes to the
 // <SEO> component so the pre-rendered HTML and the hydrated DOM agree.
 const routes = [
-  { path: '/', title: siteName, description: siteDescription, image: defaultOgImage },
+  {
+    path: '/',
+    title: siteName,
+    description: siteDescription,
+    image: defaultOgImage,
+    jsonLd: personJsonLd(),
+  },
 ]
 
 function metaTags(route) {
@@ -79,21 +85,23 @@ function metaTags(route) {
     ])
   }
 
-  const jsonLd = route.isPost
-    ? {
-        '@context': 'https://schema.org',
-        '@type': 'BlogPosting',
-        headline: route.title,
-        description: route.description,
-        image: imageUrl,
-        datePublished: route.date,
-        dateModified: route.date,
-        author: { '@type': 'Person', name: siteName, url: siteUrl },
-        publisher: { '@type': 'Person', name: siteName },
-        mainEntityOfPage: canonicalUrl,
-        ...(route.tags?.length ? { keywords: route.tags.join(', ') } : {}),
-      }
-    : null
+  const jsonLd = route.jsonLd
+    ? route.jsonLd
+    : route.isPost
+      ? {
+          '@context': 'https://schema.org',
+          '@type': 'BlogPosting',
+          headline: route.title,
+          description: route.description,
+          image: imageUrl,
+          datePublished: route.date,
+          dateModified: route.date,
+          author: { '@type': 'Person', name: siteName, url: toAbsolute('/') },
+          publisher: { '@type': 'Person', name: siteName },
+          mainEntityOfPage: canonicalUrl,
+          ...(route.tags?.length ? { keywords: route.tags.join(', ') } : {}),
+        }
+      : null
 
   return { fullTitle, head: tags.map(([, html]) => html), jsonLd }
 }

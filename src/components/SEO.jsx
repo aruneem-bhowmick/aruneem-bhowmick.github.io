@@ -1,5 +1,5 @@
 import { useEffect } from 'react'
-import { buildTitle, canonicalPath, defaultOgImage, siteUrl } from '../data/site.js'
+import { buildTitle, canonicalPath, defaultOgImage, personJsonLd, toAbsoluteUrl } from '../data/site.js'
 
 function upsertMeta(selector, attrs) {
   let element = document.head.querySelector(selector)
@@ -23,8 +23,15 @@ function upsertLink(selector, attrs) {
   }
 }
 
-function toAbsoluteUrl(pathname) {
-  return new URL(pathname, siteUrl).toString()
+function upsertJsonLd(id, data) {
+  let element = document.head.querySelector(`script[data-seo-jsonld="${id}"]`)
+  if (!element) {
+    element = document.createElement('script')
+    element.type = 'application/ld+json'
+    element.setAttribute('data-seo-jsonld', id)
+    document.head.appendChild(element)
+  }
+  element.textContent = JSON.stringify(data)
 }
 
 export default function SEO({
@@ -34,6 +41,7 @@ export default function SEO({
   image = defaultOgImage,
   type = 'website',
   noindex = false,
+  personSchema = false,
 }) {
   useEffect(() => {
     const fullTitle = buildTitle(title)
@@ -94,7 +102,11 @@ export default function SEO({
       rel: 'canonical',
       href: canonicalUrl,
     })
-  }, [description, image, noindex, path, title, type])
+
+    if (personSchema) {
+      upsertJsonLd('person', personJsonLd())
+    }
+  }, [description, image, noindex, path, personSchema, title, type])
 
   return null
 }

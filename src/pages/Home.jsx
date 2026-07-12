@@ -41,14 +41,14 @@ const dockLinks = [
 export default function Home() {
   return (
     <div className="app-shell">
-      <SEO title="Aruneem Bhowmick" description={siteDescription} path="/" />
+      <SEO title="Aruneem Bhowmick" description={siteDescription} path="/" personSchema />
       <Header />
 
       <main className="home">
         <section className="bio-section">
           <div className="bio-portrait-col">
             <div className="bio-portrait">
-              <img src="/images/pfp.jpg" alt="profile photo" />
+              <img src="/images/pfp.jpg" alt="Aruneem Bhowmick" />
             </div>
 
             <nav className="dock" aria-label="quick links">
@@ -58,7 +58,7 @@ export default function Home() {
                   href={d.href}
                   className="dock-item"
                   target="_blank"
-                  rel="noreferrer"
+                  rel="me noreferrer"
                   aria-label={d.label}
                   title={d.label}
                 >
@@ -147,7 +147,7 @@ export default function Home() {
             <ul className="plain-list misc-links">
               {problemSolvingLinks.map((w) => (
                 <li key={w.href}>
-                  <a href={w.href} target="_blank" rel="noreferrer">
+                  <a href={w.href} target="_blank" rel="me noreferrer">
                     {w.label}
                   </a>
                 </li>
@@ -162,7 +162,7 @@ export default function Home() {
             <ul className="plain-list misc-links">
               {sweLinks.map((w) => (
                 <li key={w.href}>
-                  <a href={w.href} target="_blank" rel="noreferrer">
+                  <a href={w.href} target="_blank" rel="me noreferrer">
                     {w.label}
                   </a>
                 </li>
