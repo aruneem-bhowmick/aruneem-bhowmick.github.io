@@ -1,3 +1,9 @@
+# Tool/editor directories
+.claude/
+.zed/
+.vscode/*
+!.vscode/extensions.json
+
 # Dependencies
 node_modules/
 .pnp
@@ -26,8 +32,6 @@ yarn-error.log*
 pnpm-debug.log*
 
 # Editors
-.vscode/*
-!.vscode/extensions.json
 .idea/
 *.suo
 *.ntvs*
