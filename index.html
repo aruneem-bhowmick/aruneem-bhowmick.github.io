@@ -17,15 +17,6 @@
     <script>
       document.documentElement.setAttribute('data-theme', localStorage.getItem('theme') || 'dark')
     </script>
-    <script>
-      // Browsers only evaluate the favicon SVG's prefers-color-scheme CSS on fetch,
-      // so force a re-fetch when the OS theme flips to swap it instantly.
-      window
-        .matchMedia('(prefers-color-scheme: dark)')
-        .addEventListener('change', () => {
-          document.querySelector('link[rel="icon"]').href = `/favicon.svg?${Date.now()}`
-        })
-    </script>
     <div id="root"></div>
     <script type="module" src="/src/main.jsx"></script>
   </body>
