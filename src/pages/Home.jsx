@@ -8,7 +8,7 @@ import KaggleIcon from '../components/icons/KaggleIcon.jsx'
 import { papers } from '../data/papers.js'
 import { siteDescription } from '../data/site.js'
 import { researchTerms } from '../data/researchTerms.js'
-import { problemSolvingLinks, sweLinks } from '../data/misc.js'
+import { problemSolvingLinks, sweLinks } from '../data/elsewhere.js'
 
 const dockLinks = [
   {
