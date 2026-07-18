@@ -19,6 +19,9 @@
   "dependencies": {
     "@fontsource/cascadia-code": "^5.2.3",
     "@fontsource/crimson-pro": "^5.2.8",
+    "@fontsource/roboto": "^5.2.10",
+    "@fontsource/roboto-slab": "^5.2.8",
+    "@fontsource/space-mono": "^5.2.9",
     "@mdx-js/react": "^3.1.1",
     "@tailwindcss/vite": "^4.3.2",
     "academicons": "^1.9.5",
