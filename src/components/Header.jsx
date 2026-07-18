@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { Link, NavLink, useLocation } from 'react-router-dom'
 import ThemeToggle from './ThemeToggle.jsx'
+import { navLinks } from '../data/nav.js'
 
 export default function Header() {
   const { pathname } = useLocation()
@@ -31,9 +32,16 @@ export default function Header() {
         ) : null}
       </div>
       <nav className="nav-links">
-        <NavLink to="/" end className={({ isActive }) => `nav-link${isActive ? ' nav-link-active' : ''}`}>
-          home
-        </NavLink>
+        {navLinks.map((link) => (
+          <NavLink
+            key={link.to}
+            to={link.to}
+            end
+            className={({ isActive }) => `nav-link${isActive ? ' nav-link-active' : ''}`}
+          >
+            {link.label}
+          </NavLink>
+        ))}
         <ThemeToggle />
       </nav>
     </header>

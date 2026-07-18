@@ -12,6 +12,12 @@
 // React app still hydrates and renders the full body client-side; Googlebot
 // executes that JS for the article text. It also regenerates sitemap.xml so it
 // can never drift from the route list.
+//
+// 404.html itself is a plain static file at public/404.html (no SPA boot)
+// that Vite copies straight into dist/, so GitHub Pages serves it with a real
+// 404 status for any unmatched path. Its top-bar nav links, though, are
+// generated below from the same src/data/nav.js that Header.jsx renders, so
+// the 404 page's nav can never drift out of sync with the live site's.
 
 import { mkdir, readFile, writeFile } from 'node:fs/promises'
 import { dirname, join } from 'node:path'
@@ -25,6 +31,7 @@ import {
   siteName,
   toAbsoluteUrl as toAbsolute,
 } from '../src/data/site.js'
+import { navLinks } from '../src/data/nav.js'
 
 const distDir = join(dirname(fileURLToPath(import.meta.url)), '..', 'dist')
 
@@ -149,6 +156,23 @@ function buildSitemap() {
   return `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${entries}\n</urlset>\n`
 }
 
+// Regenerates the 404 page's <nav> from src/data/nav.js so it always mirrors
+// the live Header.jsx nav links without anyone hand-editing public/404.html.
+async function syncNotFoundNav() {
+  const path = join(distDir, '404.html')
+  const html = await readFile(path, 'utf8')
+  const links = navLinks
+    .map((link) => `<a href="${escapeAttr(link.to)}" class="nav-link">${escapeAttr(link.label)}</a>`)
+    .join('\n          ')
+
+  if (!html.includes('<!--NAV_LINKS-->')) {
+    throw new Error('dist/404.html is missing the <!--NAV_LINKS--> placeholder')
+  }
+
+  await writeFile(path, html.replace('<!--NAV_LINKS-->', links))
+  console.log(`synced ${navLinks.length} nav link(s) into dist/404.html`)
+}
+
 async function main() {
   const template = await readFile(join(distDir, 'index.html'), 'utf8')
 
@@ -157,20 +181,10 @@ async function main() {
     console.log(`prerendered ${route.path} -> ${outPath.replace(distDir, 'dist')}`)
   }
 
-  // 404.html: real 404 status for genuinely missing paths, kept noindex, and
-  // still boots the SPA so a user mistyping a URL lands in the app.
-  const notFoundHtml = render(template, {
-    path: '/404',
-    title: 'Page not found',
-    description: 'This page could not be found.',
-    image: defaultOgImage,
-    noindex: true,
-  })
-  await writeFile(join(distDir, '404.html'), notFoundHtml)
-  console.log('wrote dist/404.html (noindex SPA fallback)')
-
   await writeFile(join(distDir, 'sitemap.xml'), buildSitemap())
   console.log(`wrote dist/sitemap.xml (${routes.length} urls)`)
+
+  await syncNotFoundNav()
 }
 
 main().catch((err) => {

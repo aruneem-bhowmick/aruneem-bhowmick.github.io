@@ -1,0 +1,354 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <script>
+      document.documentElement.setAttribute('data-theme', localStorage.getItem('theme') || 'dark')
+    </script>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="robots" content="noindex" />
+    <meta name="author" content="Aruneem Bhowmick" />
+    <title>404 – Page Not Found</title>
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <style>
+      :root {
+        --bg: #141414;
+        --text: #d4d4d4;
+        --text-secondary: #777;
+        --text-muted: #555;
+        --link: #7aa2f7;
+        --link-hover: #a8c8ff;
+        --hover: #7aa2f7;
+        --border: #2a2a2a;
+        --card-bg: #1a1a1a;
+        --card-border: #2a2a2a;
+        --status: #e06c75;
+        color-scheme: dark;
+      }
+
+      :root[data-theme='light'] {
+        --bg: #ffffff;
+        --text: #1a1a1a;
+        --text-secondary: #555;
+        --text-muted: #999;
+        --link: #2563eb;
+        --link-hover: #1d4ed8;
+        --hover: #2563eb;
+        --border: #e0e0e0;
+        --card-bg: #fafafa;
+        --card-border: #eee;
+        --status: #c0392b;
+        color-scheme: light;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      html,
+      body {
+        height: 100%;
+      }
+
+      body {
+        margin: 0;
+        display: flex;
+        flex-direction: column;
+        background: var(--bg);
+        color: var(--text);
+        font-family: 'Cascadia Code', 'Space Mono', ui-monospace, SFMono-Regular, Menlo, Monaco,
+          monospace;
+        font-size: 16px;
+        line-height: 1.6;
+        -webkit-font-smoothing: antialiased;
+        text-rendering: optimizeLegibility;
+      }
+
+      .top-bar {
+        display: flex;
+        justify-content: space-between;
+        align-items: baseline;
+        max-width: 1040px;
+        width: 100%;
+        margin: 0 auto;
+        padding: 2rem 2.25rem 1.25rem;
+        border-bottom: 1px solid var(--border);
+        box-sizing: border-box;
+        position: sticky;
+        top: 0;
+        z-index: 30;
+        background: var(--bg);
+      }
+
+      .brand-link {
+        color: var(--text);
+        text-decoration: none;
+        font-size: 1.35rem;
+        font-weight: 700;
+        letter-spacing: -0.01em;
+      }
+
+      .brand-link:hover {
+        color: var(--link-hover);
+      }
+
+      .nav-links {
+        display: flex;
+        align-items: baseline;
+        gap: 1.75rem;
+      }
+
+      .nav-link {
+        font-size: 1.1rem;
+        color: var(--text);
+        font-weight: 400;
+        text-decoration: none;
+      }
+
+      .nav-link:hover {
+        color: var(--hover);
+      }
+
+      .theme-toggle {
+        background: none;
+        border: none;
+        padding: 0;
+        cursor: pointer;
+        display: inline-flex;
+        align-items: center;
+        color: var(--text-secondary);
+      }
+
+      .theme-toggle:hover {
+        color: var(--hover);
+      }
+
+      .theme-toggle .icon-moon {
+        display: none;
+      }
+
+      :root[data-theme='light'] .theme-toggle .icon-sun {
+        display: none;
+      }
+
+      :root[data-theme='light'] .theme-toggle .icon-moon {
+        display: block;
+      }
+
+      main {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        text-align: center;
+        padding: 3rem 1.5rem;
+      }
+
+      .hero {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        width: 100%;
+      }
+
+      .signpost {
+        position: relative;
+        z-index: 0;
+        width: 7.5rem;
+        height: auto;
+        color: var(--text-secondary);
+        margin-bottom: -1.75rem;
+      }
+
+      .signpost-sign {
+        fill: var(--bg);
+      }
+
+      .signpost-mark {
+        fill: var(--link);
+        font-family: inherit;
+      }
+
+      .term {
+        position: relative;
+        z-index: 1;
+        width: 100%;
+        max-width: 34rem;
+        margin: 0 auto;
+        text-align: left;
+        background: var(--card-bg);
+        border: 1px solid var(--card-border);
+        border-radius: 6px;
+        padding: 1.1rem 1.5rem;
+        font-size: clamp(0.78rem, 2.1vw, 0.92rem);
+        line-height: 1.85;
+      }
+
+      .term-line {
+        white-space: normal;
+        overflow-wrap: anywhere;
+      }
+
+      .term-prompt {
+        color: var(--text-muted);
+      }
+
+      .term-status {
+        color: var(--status);
+        font-weight: 700;
+      }
+
+      .term-header {
+        color: var(--text-secondary);
+      }
+
+      .term-cursor {
+        display: inline-block;
+        width: 0.5em;
+        margin-left: 2px;
+        background: var(--text-muted);
+        animation: blink 1s steps(1) infinite;
+      }
+
+      @keyframes blink {
+        50% {
+          opacity: 0;
+        }
+      }
+
+      @media (prefers-reduced-motion: reduce) {
+        .term-cursor {
+          animation: none;
+        }
+      }
+
+      .message {
+        margin: 1.75rem 0 0;
+        font-size: 1rem;
+        color: var(--text-secondary);
+      }
+
+      .home-link {
+        margin-top: 1rem;
+        color: var(--link);
+        text-decoration: underline;
+        text-underline-offset: 3px;
+      }
+
+      .home-link:hover {
+        color: var(--link-hover);
+      }
+
+      a:focus-visible {
+        outline: 2px solid var(--link);
+        outline-offset: 3px;
+        border-radius: 2px;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="top-bar">
+      <a href="/" class="brand-link">Aruneem Bhowmick</a>
+      <nav class="nav-links">
+        <!--NAV_LINKS-->
+        <button type="button" class="theme-toggle" id="theme-toggle" aria-label="Switch theme" title="Switch theme">
+          <svg
+            class="icon-sun"
+            width="14"
+            height="14"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          >
+            <circle cx="12" cy="12" r="5" />
+            <line x1="12" y1="1" x2="12" y2="3" />
+            <line x1="12" y1="21" x2="12" y2="23" />
+            <line x1="4.22" y1="4.22" x2="5.64" y2="5.64" />
+            <line x1="18.36" y1="18.36" x2="19.78" y2="19.78" />
+            <line x1="1" y1="12" x2="3" y2="12" />
+            <line x1="21" y1="12" x2="23" y2="12" />
+            <line x1="4.22" y1="19.78" x2="5.64" y2="18.36" />
+            <line x1="18.36" y1="5.64" x2="19.78" y2="4.22" />
+          </svg>
+          <svg
+            class="icon-moon"
+            width="14"
+            height="14"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          >
+            <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" />
+          </svg>
+        </button>
+      </nav>
+    </div>
+    <main>
+      <div class="hero">
+        <svg class="signpost" viewBox="0 0 72 100" fill="none" aria-hidden="true" focusable="false">
+          <line x1="36" y1="14" x2="36" y2="100" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" />
+          <path
+            class="signpost-sign"
+            d="M36 20 H50 L58 26 L50 32 H36 Z"
+            stroke="currentColor"
+            stroke-width="2.5"
+            stroke-linejoin="round"
+            transform="rotate(-8 36 26)"
+          />
+          <path
+            class="signpost-sign"
+            d="M36 40 H18 L10 46 L18 52 H36 Z"
+            stroke="currentColor"
+            stroke-width="2.5"
+            stroke-linejoin="round"
+            transform="rotate(15 36 46)"
+          />
+          <path
+            class="signpost-sign"
+            d="M36 56 H50 L58 62 L50 68 H36 Z"
+            stroke="currentColor"
+            stroke-width="2.5"
+            stroke-linejoin="round"
+            transform="rotate(30 36 62)"
+          />
+          <text class="signpost-mark" x="54" y="17" font-size="16" font-weight="700" text-anchor="middle">?</text>
+        </svg>
+        <div class="term" role="img" aria-label="Terminal output showing an HTTP 404 Not Found response">
+          <div class="term-line"><span class="term-prompt">$ </span>curl -I https://aruneem-bhowmick.github.io/&lt;path&gt;</div>
+          <div class="term-line term-status">HTTP/1.1 404 Not Found</div>
+          <div class="term-line term-header">x-reason: page-does-not-exist<span class="term-cursor" aria-hidden="true">&nbsp;</span></div>
+        </div>
+      </div>
+      <p class="message">this page doesn't exist.</p>
+      <a href="/" class="home-link">go back home</a>
+    </main>
+    <script>
+      ;(function () {
+        var root = document.documentElement
+        var btn = document.getElementById('theme-toggle')
+
+        function label(theme) {
+          return 'Switch to ' + (theme === 'dark' ? 'light' : 'dark') + ' theme'
+        }
+
+        btn.setAttribute('aria-label', label(root.getAttribute('data-theme')))
+        btn.title = btn.getAttribute('aria-label')
+
+        btn.addEventListener('click', function () {
+          var next = root.getAttribute('data-theme') === 'dark' ? 'light' : 'dark'
+          root.setAttribute('data-theme', next)
+          localStorage.setItem('theme', next)
+          btn.setAttribute('aria-label', label(next))
+          btn.title = btn.getAttribute('aria-label')
+        })
+      })()
+    </script>
+  </body>
+</html>

@@ -31,7 +31,8 @@ jobs:
         run: npm ci
 
       # Builds, then pre-renders a real HTML file per route (200 status + baked
-      # meta tags) and the 404.html SPA fallback. See scripts/prerender.mjs.
+      # meta tags). See scripts/prerender.mjs. The static public/404.html is
+      # copied into dist/ by the Vite build itself.
       - name: Build
         run: npm run build
 
