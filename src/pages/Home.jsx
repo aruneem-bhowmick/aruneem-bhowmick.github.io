@@ -81,8 +81,8 @@ export default function Home() {
                 flipDelayMs={40}
               />
             </h1>
-            <p>Hi, I'm Aruneem Bhowmick.</p>
-            <p>
+            <p data-nosnippet>Hi, I'm Aruneem Bhowmick.</p>
+            <p data-nosnippet>
               I study computer science, data science, and mathematics at the{' '}
               <a href="https://raikes.unl.edu/" target="_blank" rel="noreferrer">
                 Raikes School
