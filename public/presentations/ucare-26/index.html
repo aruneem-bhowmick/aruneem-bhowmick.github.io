@@ -89,6 +89,8 @@ div.frag.on { transform: none; }
   padding: 16px 28px 22px; border-top: 2px solid var(--accent); display: none; z-index: 10;
 }
 .notes.show { display: block; }
+.notes strong { color: #fff; font-weight: 700; }
+.notes i { color: #cfd8ea; }
 .notes b { color: #7aa2f7; font-family: "Space Mono", monospace; font-weight: 400; font-size: 13px; }
 .hint { position: fixed; top: 10px; left: 14px; font: 12px "Space Mono", monospace; color: var(--ink2);
   opacity: .7; z-index: 5; }
@@ -107,7 +109,9 @@ aside { display: none; }
   <div class="t" style="left:80px;top:400px;width:620px"><p class="muted">Looking inside large language models (LLMs) for signs that an answer is ready, so they could stop early on easy questions</p></div>
   <div class="t mono" style="left:80px;top:560px;width:640px">Aruneem Bhowmick<br>Mentor: Dr. Seth Polsley · University of Nebraska–Lincoln</div>
   <svg class="art"></svg>
-  <aside>About 30 seconds. Introduce yourself and the one-line idea: "Today I want to convince you that LLMs waste effort in a very specific way, and show you how I look inside it to find out when it already has the answer." Don't explain anything technical yet.</aside>
+  <aside>[~30 s] <strong>Project.</strong> <i>When is Transformer Computation Unnecessary?</i> (UCARE 2026–27, mentor Dr. Seth Polsley, UNL). Decoder-only LLMs apply the same depth, every transformer block, to every token regardless of how hard the input is.<br><br>
+<strong>Questions.</strong> (RQ1) At what depth does task-relevant information become linearly decodable from the residual stream, and does that depth differ by task family? (RQ2) Do deeper blocks add new task information or mainly refine it? (RQ3) Can geometric signals such as layer-to-layer stability flag unnecessary computation? (RQ4) Can halting on those signals beat output-space heuristics (softmax entropy, max-probability confidence) on the compute–accuracy tradeoff?<br><br>
+<strong>Figure.</strong> A stack of blocks with a read-out after each one: the core measurement of the project.</aside>
 </section>
 
 <!-- 2 · Hook -->
@@ -120,7 +124,8 @@ aside { display: none; }
   <div class="t frag hand" data-step="3" style="left:730px;top:395px;font-size:36px;line-height:1.25;color:var(--orange)">17 × 20 = 340<br>17 × 3 = 51<br>340 + 51 = 391 … I think?</div>
   <div class="t frag" data-step="4" style="left:80px;top:620px;width:1120px;text-align:center"><p class="lead">Which one took more effort?</p></div>
   <svg class="art"></svg>
-  <aside>About 1 minute. Actually ask the audience both questions and pause after each. Press → to reveal "Paris", then "now try this one" brings in the second question, then the scratch work, then the closing question. Let them feel the difference: one answer just appears, the other takes work.</aside>
+  <aside>[~1 min] The two prompts stand in for the two task families in the study: <strong>factual recall</strong>, a content lookup over stored associations, versus <strong>multi-step algorithmic computation</strong>, where intermediate results must be composed.<br><br>
+The human contrast motivates input-adaptive computation. The technical analogue: a fixed-depth transformer spends the same forward-pass compute per token on both prompts. Keep the claim at the level of effort, not mechanism; nothing here says LLMs solve problems the way people do.</aside>
 </section>
 
 <!-- 3 · Statement -->
@@ -128,7 +133,9 @@ aside { display: none; }
   <div class="t" style="left:80px;top:62px;width:1120px"><h2>The problem</h2></div>
   <div class="t" style="left:80px;top:588px;width:1120px"><p class="lead">Your brain adjusts its effort to the question: almost none for Paris, real work for 17&nbsp;×&nbsp;23. <span class="hl">Today's LLMs don't.</span> They spend exactly the same amount of work on both.</p></div>
   <svg class="art" style="transform:translateY(-90px)"></svg>
-  <aside>About 30 seconds. "Your brain spent different amounts of effort on those. Today's LLMs spend exactly the same on both." Point at the two charts: yours is uneven, the LLM's is flat. This is the whole problem in one picture.</aside>
+  <aside>[~30 s] In a standard decoder-only transformer, per-token inference cost is fixed by the architecture: every token passes through all L blocks, roughly 2 × (parameter count) FLOPs per token for the forward pass. There is no built-in way to spend less on easy inputs.<br><br>
+<strong>Prior work on adaptive computation:</strong> Adaptive Computation Time (Graves, 2016); Universal Transformers with dynamic halting (Dehghani et al., 2019); early-exit encoders such as DeeBERT (Xin et al., 2020); CALM, confidence-based early exit for generation (Schuster et al., 2022); Mixture-of-Depths token routing (Raposo et al., 2024).<br><br>
+The bar chart is schematic, not measured.</aside>
 </section>
 
 <!-- 4 · Car wash -->
@@ -136,7 +143,9 @@ aside { display: none; }
   <div class="t" style="left:80px;top:62px;width:1120px"><h2>How an LLM answers a question</h2></div>
   <div class="t" style="left:80px;top:560px;width:1120px"><p>An LLM answers a question the way an automatic car wash cleans a car: everything goes through the same fixed line of steps. A spotless car and a muddy one get every brush and rinse, and <span class="hl">an easy question and a hard one get every step.</span></p></div>
   <svg class="art"></svg>
-  <aside>About 45 seconds. Picture an automatic car wash. A car that is already spotless and a car caked in mud roll through the exact same tunnel: soak, scrub, rinse, wax, dry. The clean car did not need any of it, but the tunnel has no way to tell. An LLM works the same way: a question goes in one end, passes through a fixed series of steps, between 6 and 32 for the models I study, and the answer comes out the other end. Easy or hard, it gets the full wash. Clicks: (1) "needs none of it!" (2) the spotless car drives two bays in and leaves: "what if it could leave here?" That is the whole idea of my research in one picture. (3) The muddy car really does need every bay, all the way to the end, and comes out clean.</aside>
+  <aside>[~45 s] <strong>One bay = one transformer block.</strong> In Pythia (GPT-NeoX), each block applies layer norm, computes attention and an MLP in parallel from the same input (parallel residual), and adds both back into the residual stream. Block counts: Pythia-70M 6, 160M 12, 410M 24, 1B 16, 2.8B 32.<br><br>
+<strong>What is measured.</strong> The residual stream after the embedding layer (index 0) and after every block, giving L + 1 snapshots per input.<br><br>
+<strong>Clicks.</strong> (1) "needs none of it!" (2) The spotless car leaves after two bays: early exit, halting once the representation already supports the answer. (3) The muddy car takes the full tunnel: the fixed-depth baseline every input gets today.</aside>
 </section>
 
 <!-- 5 · Cost -->
@@ -145,7 +154,8 @@ aside { display: none; }
   <div class="t mono" style="left:80px;top:676px;width:1120px">Source: International Energy Agency, <i>Energy and AI</i> (April 2025): 415 TWh in 2024, about 945 TWh projected for 2030.</div>
   <div class="t" style="left:80px;top:575px;width:1120px"><p>The models I studied have <span class="hl">6 to 32 steps</span>, and every question pays for all of them. Data centers already use <span class="hl-o">about 1.5% of the world's electricity</span>, and that could double by 2030.</p></div>
   <svg class="art" style="transform:translateY(-20px)"></svg>
-  <aside>About 45 seconds. Electricity, time, and money are spent on every step of every question, multiplied by billions of questions. The sticky note is from the International Energy Agency's Energy and AI report (April 2025): data centers used about 415 TWh in 2024, roughly 1.5% of global electricity, and the IEA's base case reaches about 945 TWh by 2030, slightly more than Japan's total electricity use today, with AI the main driver. Note it's all data centers, not AI alone.</aside>
+  <aside>[~45 s] Per-token compute scales linearly with depth, so exiting after k of L blocks saves up to roughly (L − k)/L of the forward pass, minus the cost of the halting check. In autoregressive generation, early exit also has to handle the KV cache for skipped blocks, which later tokens still attend to; CALM propagates hidden states to fill them in (Schuster et al., 2022).<br><br>
+<strong>Energy figure.</strong> IEA, <i>Energy and AI</i> (April 2025): data centres used about 415 TWh in 2024 (about 1.5% of global electricity); the base case reaches about 945 TWh by 2030, with AI the main driver of growth. This covers all data-centre load, not LLM inference alone. Say so if asked.</aside>
 </section>
 
 <!-- 6 · Fast & slow -->
@@ -161,7 +171,9 @@ aside { display: none; }
   </div>
   <div class="t" style="left:80px;top:555px;width:1120px"><p>Psychologist Daniel Kahneman describes two speeds of human thinking: fast and automatic, or slow and deliberate (<i>Thinking, Fast and Slow</i>, 2011). an LLM isn't a brain, but matching effort to difficulty makes sense for both.</p></div>
   <svg class="art"></svg>
-  <aside>About 1 minute. Many people know Kahneman's book. Fast thinking is automatic; slow thinking is deliberate. Say the guard sentence out loud: "An LLM doesn't think like a brain, but the question of matching effort to difficulty applies to both."</aside>
+  <aside>[~1 min] Kahneman's System 1 / System 2 (<i>Thinking, Fast and Slow</i>, 2011) is used only as a motivating analogy.<br><br>
+<strong>Technical counterpart.</strong> The hypothesised split is between tasks whose answer is a lookup over stored associations (factual recall, sentiment) and tasks that compose intermediate results (modular arithmetic, bracket matching). Interpretability work supports the lookup side: feed-forward layers act as key–value memories (Geva et al., 2021), and factual associations can be localised to and edited in mid-layer MLPs (Meng et al., 2022, ROME).<br><br>
+No claim of cognitive equivalence.</aside>
 </section>
 
 <!-- 7 · Hypothesis -->
@@ -169,7 +181,9 @@ aside { display: none; }
   <div class="t" style="left:80px;top:62px;width:1120px"><h2>My hypothesis</h2></div>
   <div class="t" style="left:80px;top:555px;width:1120px"><p class="lead">My bet: easy questions are <span class="hl">"done" early</span>. If the LLM already has the answer halfway down the line, the rest of the line is wasted work. <span class="hl">Could it stop there?</span></p></div>
   <svg class="art"></svg>
-  <aside>About 30 seconds. State the hypothesis plainly: recalling facts and reading tone should be "fast" questions that the LLM figures out early, while puzzles and math should need the whole line.</aside>
+  <aside>[~30 s] <strong>H1 (central).</strong> Factual-recall and shallow-semantic tasks become linearly decodable at earlier layers than algorithmic reasoning tasks: recall is a lookup that finishes mid-depth, while reasoning needs further composition in deeper blocks.<br><br>
+<strong>Supporting hypotheses.</strong> H2: mutual information between representations and targets plateaus early for lookup and keeps rising for reasoning. H3: layer-to-layer representation stability converges earlier for lookup. H4: stability-based halting matches entropy-based early exit in accuracy with less compute.<br><br>
+The dimmed stations in the top row are the computation H1 predicts is unnecessary for lookup inputs.</aside>
 </section>
 
 <!-- 8 · Peeking -->
@@ -177,7 +191,9 @@ aside { display: none; }
   <div class="t" style="left:80px;top:62px;width:1120px"><h2>Looking inside</h2></div>
   <div class="t" style="left:80px;top:575px;width:1120px"><p>To see what the LLM knows, I pause it after every step and check its work so far, like stopping a student midway through a problem to ask: <span class="hl">"Do you know it yet?"</span></p></div>
   <svg class="art"></svg>
-  <aside>About 45 seconds. This is the core method in plain words. You never change the LLM; you look at its in-progress work after each step and test whether the answer can already be read from it.</aside>
+  <aside>[~45 s] <strong>Extraction.</strong> Forward hooks on the embedding layer and on each GPT-NeoX block capture the residual stream. Weights are frozen and the model is never modified (inference only). Each input is pooled to one vector per layer: last-token pooling for single-sequence tasks; for MRPC the two sentences are pooled separately and concatenated. Vectors are cached as safetensors with a per-example manifest.<br><br>
+<strong>Probing.</strong> A probe is trained independently at each layer, giving a score-versus-depth curve per task.<br><br>
+<strong>Prediction depth</strong> (Baldock et al., 2021) is also computed per example: the earliest layer from which the probe's prediction never changes again. It is the per-example version of "when did it know?"</aside>
 </section>
 
 <!-- 9 · Simple detector -->
@@ -185,7 +201,8 @@ aside { display: none; }
   <div class="t" style="left:80px;top:62px;width:1120px"><h2>Honesty check #1</h2></div>
   <div class="t" style="left:80px;top:575px;width:1120px"><p>To read the LLM's work, I use a deliberately simple detector: a highlighter, not a detective. If something this simple can find the answer, <span class="hl">the answer was plainly there.</span></p></div>
   <svg class="art"></svg>
-  <aside>About 30 seconds. A powerful tool could "solve" the question on its own, which would tell us nothing about the LLM. So I use the simplest possible tool on purpose: a highlighter, not a detective.</aside>
+  <aside>[~30 s] <strong>The probe is linear:</strong> L2-regularised logistic regression for classification, ridge regression for the periodic-table task. Features are standardised and classes balanced. Regularisation strength is chosen from a grid inside 5-fold stratified cross-validation.<br><br>
+<strong>Why linear</strong> (Alain &amp; Bengio, 2016). An expressive probe such as an MLP can learn the task from the features on its own, which mixes up what the representation encodes with what the probe computes (Hewitt &amp; Liang, 2019). "Linearly decodable at layer l" is therefore the working definition of "the answer is already there." The cost is that information present but non-linearly encoded is missed, so these are lower bounds.</aside>
 </section>
 
 <!-- 10 · Placebo test -->
@@ -193,7 +210,8 @@ aside { display: none; }
   <div class="t" style="left:80px;top:62px;width:1120px"><h2>Honesty check #2</h2></div>
   <div class="t" style="left:80px;top:575px;width:1120px"><p>Then comes the placebo test. Every check is rerun with the answers scrambled, and like a drug trial, <span class="hl">the real result has to beat the placebo.</span></p></div>
   <svg class="art"></svg>
-  <aside>About 45 seconds. Click once to scramble the answers. If the detector does just as well on scrambled answers, it's fooling itself. Lay audiences immediately understand why a placebo matters.</aside>
+  <aside>[~45 s] <strong>Control.</strong> A shuffled-label baseline: same features, same folds, same probe, but the labels randomly permuted across examples. <strong>Selectivity = task score − control score</strong>, a simpler variant of Hewitt &amp; Liang's control tasks (2019). It measures how much of the probe's score reflects real structure rather than the probe's capacity to fit arbitrary labels.<br><br>
+<strong>Limitation.</strong> Shuffling breaks every feature–label relationship, real or spurious. A shortcut that is genuinely correlated with the label survives in the real run and is absent from the control, so it inflates selectivity instead of being caught. That is the setup for slide 17.</aside>
 </section>
 
 <!-- 11 · Question types overview -->
@@ -201,7 +219,11 @@ aside { display: none; }
   <div class="t" style="left:80px;top:62px;width:1120px"><h2>What I tested</h2></div>
   <div class="t" style="left:80px;top:590px;width:1120px"><p>I tested four kinds of questions: two I expected the LLM to answer <span class="hl">fast</span>, and two puzzles I expected to need <span class="hl-o">the whole line</span>.</p></div>
   <svg class="art"></svg>
-  <aside>About 20 seconds. Two "fast thinking" question types on the left, two "slow thinking" puzzles on the right. The next two slides show an example of each.</aside>
+  <aside>[~20 s] <strong>Track A tasks by family.</strong><br>
+Factual lookup: LAMA/T-REx (Petroni et al., 2019), a relation-filtered subset; and a periodic-table property task (regression).<br>
+Shallow semantic: SST-2 sentiment; MRPC paraphrase detection.<br>
+Algorithmic: Dyck-3 well-formedness; modular addition mod 7.<br><br>
+Lookup and semantic are predicted "fast", algorithmic "slow". Synthetic tasks come from seeded generators, so each of the five seeds is a fresh dataset rather than a resample.</aside>
 </section>
 
 <!-- 12 · Fast questions -->
@@ -211,7 +233,8 @@ aside { display: none; }
   <div class="t" style="left:720px;top:300px;width:420px"><p class="big">"A gorgeous,<br>witty film."</p><p class="hand" style="font-size:44px;color:var(--green);margin-top:18px">→ positive</p></div>
   <div class="t" style="left:80px;top:575px;width:1120px"><p>Fast questions rely on recall and recognition, like finishing a familiar fact or hearing the tone of a movie review. I expected the LLM to have these answers early.</p></div>
   <svg class="art"></svg>
-  <aside>About 30 seconds. Trivia recall and reading tone. I also tested facts about chemical elements (a periodic-table quiz) and whether two sentences mean the same thing. The examples are illustrative of each question type.</aside>
+  <aside>[~30 s] <strong>Trivia</strong> = LAMA/T-REx: cloze-style relational facts ("X is located in ___"), cast as classification over a small candidate set (chance about 1/3 in the pilot subset). <strong>Tone</strong> = SST-2 binary sentiment (Socher et al., 2013).<br><br>
+Not shown: MRPC paraphrase detection (Dolan &amp; Brockett, 2005) and the periodic-table property regression. The examples on the slide illustrate each task; they are not drawn from the datasets.</aside>
 </section>
 
 <!-- 13 · Slow questions -->
@@ -221,7 +244,8 @@ aside { display: none; }
   <div class="t" style="left:720px;top:300px;width:420px"><p class="big">( [ { } ] ) <span class="hand" style="color:var(--red)">→ balanced</span></p><p class="big" style="margin-top:22px">( [ ) ] <span class="hand" style="color:var(--red)">→ broken</span></p></div>
   <div class="t" style="left:80px;top:575px;width:1120px"><p>Slow questions need step-by-step work, like counting around a clock or checking that every bracket closes in the right order. I expected these to take the whole line.</p></div>
   <svg class="art"></svg>
-  <aside>About 30 seconds. Clock math: count forward and wrap around, so 5 hours after 9 o'clock is 2 o'clock. (My actual task uses a 7-hour clock; the 12-hour version is the same idea on a familiar clock.) The bracket puzzle: is every opened bracket closed in the right order, like nesting dolls? Both need step-by-step work, so I expected them to need the whole line.</aside>
+  <aside>[~30 s] <strong>Clock math</strong> = modular addition, (a + b) mod p. The pilot uses p = 7; the 12-hour clock on the slide is the same operation with a familiar modulus. It is a standard interpretability testbed because networks trained on it learn a recognisable circular (Fourier) representation (Nanda et al., 2023).<br><br>
+<strong>Bracket puzzle</strong> = Dyck-3: is a sequence over three bracket types well-formed? It requires tracking a stack of open brackets and is a canonical formal-language task for studying hierarchical structure in transformers (Hahn, 2020; Yao et al., 2021). Brackets are space-separated so each is a single token.</aside>
 </section>
 
 <!-- 14 · Finding 1 -->
@@ -230,7 +254,10 @@ aside { display: none; }
   <div class="t mono" style="left:80px;top:665px;width:1100px">Best step, 160M-parameter Pythia model, average of 5 repeats. Placebo = same test with the answers shuffled.</div>
   <div class="t" style="left:80px;top:585px;width:1120px"><p><span class="hl">The answer really is in there.</span> On every kind of question, the real result clears the placebo, so the LLM's work in progress genuinely contains the answer.</p></div>
   <svg class="art" style="transform:translateY(-62px)"></svg>
-  <aside>About 45 seconds. In every pair, the left bar is the real test and the right bar is the placebo. The placebo bars sit at the grey "guessing" level, and the real bars clear it. That gap is the evidence that the answer is genuinely present. Clock math has the biggest gap. (Save for Q&amp;A: the placebo catches memorization, not every kind of shortcut. That's coming up.)</aside>
+  <aside>[~45 s] Pythia-160M, best layer per task, mean of 5 seeds, 5-fold CV. Real vs placebo:<br>
+Trivia 0.867 vs 0.373 (chance 1/3); sentiment 0.742 vs 0.507 (1/2); brackets 0.685 vs 0.509 (1/2); clock math 0.981 vs 0.145 (1/7).<br><br>
+Placebo bars at chance confirm the control behaves as designed. Selectivity is large for trivia (0.49) and clock math (0.84), small for sentiment (0.24) and brackets (0.18). MRPC, not shown, is weakest (0.12 on 160M).<br><br>
+<strong>Caveat.</strong> A positive gap shows the information is linearly decodable, not that the model uses it. Causal claims need interventions such as ablation or activation patching.</aside>
 </section>
 
 <!-- 15 · Finding 2 -->
@@ -239,7 +266,9 @@ aside { display: none; }
   <div class="t mono" style="left:80px;top:665px;width:1100px">Pythia 70M (6 steps) and 160M (12 steps), average of 5 repeats (they agree within about 2 points).</div>
   <div class="t" style="left:80px;top:556px;width:1120px"><p>Clock math has an <span class="hl">"aha" moment</span>: the LLM starts at pure guessing, then suddenly gets it. The bigger model gets there 17% of the way through, the smaller one a third to half.</p></div>
   <svg class="art" style="transform:translateY(-85px)"></svg>
-  <aside>About 45 seconds. "It starts at pure guessing. A couple of steps in, it suddenly gets it, and the rest is double-checking." Click once to add the smaller model. The x-axis is how far through the line of steps we are, so the two model sizes can share a chart.</aside>
+  <aside>[~45 s] Modular addition mod 7. Probe accuracy against relative depth (block index ÷ number of blocks), so both models share one axis. Both start near chance at the embedding layer and plateau at about 0.98. Pythia-160M reaches the plateau by about block 2 of 12 (17% depth); 70M needs a third to half of its depth. Selectivity is about 0.83 for both. Means of 5 seeds; the two models agree within about 2 points at the plateau.<br><br>
+<strong>Not grokking.</strong> This is a jump over depth inside a trained model. Grokking (Power et al., 2022) is a delayed jump over training time.<br><br>
+<strong>Caveat.</strong> Early decodability means the answer is linearly present, not that later blocks are unnecessary for the model's own output. Testing that is the job of the halting experiments.</aside>
 </section>
 
 <!-- 16 · Clever Hans -->
@@ -247,7 +276,8 @@ aside { display: none; }
   <div class="t" style="left:80px;top:62px;width:1120px"><h2>Finding 3: a surprise</h2></div>
   <div class="t" style="left:80px;top:575px;width:1120px"><p>Meet Clever Hans, a horse who seemed to do arithmetic by tapping his hoof. He was really reading his trainer's body language, and stopped tapping when the trainer relaxed.</p></div>
   <svg class="art"></svg>
-  <aside>About 30 seconds. Berlin, early 1900s. Tell the story: Hans would tap out answers with his hoof and stop at the right number. It turned out he was watching his trainer relax when he reached the answer. Then: "My LLM found a Clever Hans of its own."</aside>
+  <aside>[~30 s] Clever Hans (Pfungst, 1911) is the standard name for a model succeeding through a spurious cue rather than the intended skill, also called shortcut learning (Geirhos et al., 2020).<br><br>
+<strong>Probing analogue.</strong> The probe reads a surface feature correlated with the label (length, token identity, position) instead of the computed property. Such features are often linearly decodable at the embedding layer, so layer-0 accuracy is a useful sanity check: a task that needs computation should be at chance before any block has run.</aside>
 </section>
 
 <!-- 17 · Bracket shortcut -->
@@ -255,7 +285,9 @@ aside { display: none; }
   <div class="t" style="left:80px;top:62px;width:1120px"><h2>Finding 3, continued</h2></div>
   <div class="t" style="left:80px;top:590px;width:1120px"><p class="small">My bracket puzzle had a Clever Hans: broken examples often <i>ended</i> in a telltale bracket, so the detector could spot them without solving anything. I redesigned the puzzle so the ending can't give it away, and I'm re-running it now.</p></div>
   <svg class="art"></svg>
-  <aside>About 45 seconds. The detector seemed to know the answer at the very start, before any processing happened, which should be impossible for a real puzzle. That was the clue. The placebo test could not catch this kind of shortcut; it needed a closer look. Finding and fixing it is what real science looks like. (Once the re-run is done, add the "after the fix" line to this chart.)</aside>
+  <aside>[~45 s] <strong>Symptom.</strong> Pilot v1 found Dyck-3 decodable at about 57% at layer 0, before any block had run. For a task that needs stack tracking, above-chance layer-0 accuracy points to a surface cue.<br><br>
+<strong>Suspected cause and fix.</strong> The original corruption (swap, delete or insert a bracket) could change sequence length and per-type bracket counts, and the BPE tokenizer merged runs of brackets so the final token could span several characters. The fix permutes interior brackets only, verifies the result is malformed, preserves length and the bracket multiset, and space-separates brackets so each is one token.<br><br>
+<strong>Rerun</strong> (5 seeds, both models): layer-0 accuracy 0.573 → 0.559; best-layer selectivity 0.156 → 0.161 (70M) and 0.176 → 0.190 (160M). The fix barely moved the numbers, so the remaining layer-0 signal has a source not yet identified. Open item.</aside>
 </section>
 
 <!-- 18 · Finding 4 -->
@@ -263,7 +295,13 @@ aside { display: none; }
   <div class="t" style="left:80px;top:62px;width:1120px"><h2>Where things stand</h2></div>
   <div class="t" style="left:80px;top:580px;width:1120px"><p>The results are <span class="hl">real in places, but not yet clean</span>. With small models and early data, the "fast vs. slow" pattern shows up, though not as neatly as I bet. That's what the next stage is for.</p></div>
   <svg class="art"></svg>
-  <aside>About 45 seconds. Be direct: some predictions held, one went the other way, and one is waiting on the fixed puzzle. Audiences trust "here's what surprised us" more than a clean victory lap.</aside>
+  <aside>[~45 s] <strong>Status against H1</strong> at pilot scale (70M and 160M only):<br>
+Factual and semantic tasks are linearly decodable with positive selectivity, but not uniformly earlier than algorithmic ones.<br>
+Modular arithmetic, an algorithmic task, becomes decodable earliest and most cleanly: the opposite of H1's prediction.<br>
+LAMA/T-REx peaks late (final block on 160M).<br>
+Periodic-table regression is non-monotonic across depth, partly from ill-conditioned ridge fits at low regularisation (its grid was raised to 0.1–100).<br>
+Dyck-3 stays low-selectivity after the corruption fix.<br><br>
+H2 to H4 are not yet tested. Two models is too few to separate task effects from scale effects.</aside>
 </section>
 
 <!-- 19 · Impact -->
@@ -274,7 +312,11 @@ aside { display: none; }
   <div class="t frag" data-step="3" style="left:880px;top:370px;width:300px"><p style="color:var(--red)">A warning light</p><p class="small">If a question keeps the LLM working to the very end, maybe a human should double-check.</p></div>
   <div class="t frag" data-step="4" style="left:80px;top:580px;width:1120px"><p>If LLMs could <span class="hl">stop when they're sure</span>, all three of these become possible, and the signal for when to stop comes from inside the LLM itself.</p></div>
   <svg class="art"></svg>
-  <aside>About 1.5 minutes. Click to reveal each card, then the closing line. Spend most of the time on cost and energy, then the warning light, which lands well with lay audiences: knowing how hard the LLM is "working" is itself useful. If asked about prior work: existing early-stopping methods report up to about 3× speedups (CALM, Google, 2022); your angle is a more principled signal for when it's safe to stop.</aside>
+  <aside>[~1.5 min] <strong>Cost.</strong> Early exit cuts per-token compute; CALM reports up to about 3× speedups on generation tasks using output-confidence exits (Schuster et al., 2022).<br>
+<strong>Devices.</strong> Average depth, not maximum depth, drives latency and energy, which matters for on-device inference.<br>
+<strong>Warning light.</strong> An input that keeps the model computing to the final block, or whose representation never stabilises, may be a useful uncertainty signal for selective prediction or human review.<br><br>
+<strong>Contribution.</strong> The signal itself: representation-geometric stopping criteria instead of softmax-entropy or max-probability thresholds, which are often miscalibrated in modern networks (Guo et al., 2017).<br><br>
+Clicks reveal the three cards, then the closing line.</aside>
 </section>
 
 <!-- 20 · Next -->
@@ -285,7 +327,9 @@ aside { display: none; }
   <div class="t" style="left:900px;top:175px;width:300px"><p class="small"><span class="hl">3 ·</span> Build and test a real "pencils down" rule</p></div>
   <div class="t" style="left:640px;top:540px;width:560px"><p>Each step builds toward the same goal: an LLM that can tell when it <span class="hl">already knows the answer</span>, and stop there.</p></div>
   <svg class="art"></svg>
-  <aside>About 1 minute. Larger models on the Holland Computing Center; measuring the moment each answer stops changing (the actual "stop now" signal); then building an early-stopping rule and measuring how much work it saves.</aside>
+  <aside>[~1 min] <strong>1. Scale.</strong> Extend probing to Pythia-410M, 1B and 2.8B on the Holland Computing Center GPU cluster. The Pythia suite (Biderman et al., 2023) trains every size on the same deduplicated data in the same order, so differences across sizes are not confounded by data.<br>
+<strong>2. Benchmark Three</strong> (Oct 2026–Jan 2027): estimate mutual information, entropy reduction and intrinsic dimensionality across layers (RQ2, H2); measure stability via cosine similarity between successive layers and Jacobian norm decay (RQ3, H3).<br>
+<strong>3. Benchmark Four</strong> (Jan–Mar 2027): implement stability-based early-exit policies and compare compute savings and accuracy against fixed-depth inference and entropy-based early exit (RQ4, H4).</aside>
 </section>
 
 <!-- 21 · Close -->
@@ -302,7 +346,13 @@ aside { display: none; }
   </div>
   <div class="t" style="left:80px;top:590px"><p>Thank you · Questions?</p><p class="mono" style="margin-top:6px">aruneem-bhowmick.github.io</p></div>
   <svg class="art"></svg>
-  <aside>About 30 seconds. Return to the opening hook, then walk the three goals: the first is done (the pilot), the other two are the next stages. Then stop. Likely questions: "Is the LLM conscious?" (No, it's an analogy about effort.) "How much energy would this save?" (Not measured yet; that's the final stage.) "Why not use a smaller LLM for easy questions?" (You often don't know a question is easy until you've started, so the signal has to come from inside.)</aside>
+  <aside>[~30 s] Callback to the hook, then the three goals. Done: layerwise linear decodability (Benchmark Two pilot). Next: stability and information dynamics (Benchmark Three), then principled halting (Benchmark Four).<br><br>
+<strong>Likely technical questions.</strong><br>
+<i>Why linear probes?</i> To measure what the representation encodes rather than what the probe computes; results are lower bounds on information present.<br>
+<i>Why Pythia?</i> Open weights, a suite of sizes trained on identical data in identical order, and public training checkpoints.<br>
+<i>How much compute would this save?</i> Not measured yet; that is Benchmark Four.<br>
+<i>Why not route easy questions to a smaller model?</i> Difficulty often isn't known before processing starts, so the signal has to come from inside the forward pass.<br>
+<i>Is finding 2 grokking?</i> No: grokking is a jump over training time; this is a jump over depth in a trained model.</aside>
 </section>
 
 </div>
