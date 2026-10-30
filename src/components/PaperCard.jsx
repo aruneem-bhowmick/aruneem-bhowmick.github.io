@@ -44,7 +44,12 @@ export default function PaperCard({ paper }) {
                 <a href={l.href} target="_blank" rel="noreferrer">
                   {l.label}
                 </a>
-                {i < paper.links.length - 1 ? ' / ' : ''}
+                {i < paper.links.length - 1 ? (
+                  <>
+                    {' '}
+                    <span className="heading-sep" aria-hidden="true">•</span>{' '}
+                  </>
+                ) : null}
               </span>
             ))}
           </p>
